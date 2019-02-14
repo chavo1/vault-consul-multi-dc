@@ -1,0 +1,9 @@
+.vagrant/
+pkg/
+consul_logs/
+test.sh
+token/
+vault_logs
+CA_cert.crt
+intermediate.cert.pem
+pki_intermediate.csr
