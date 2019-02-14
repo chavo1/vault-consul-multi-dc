@@ -1,8 +1,9 @@
 ## This repo contains a sample of Consul cluster in multi-datacenter deployment over HTTPS. 
-#### It will spin up 8 Vagrant machines with 3 Consul servers - 1 Consul client in dc1 and 3 Consul servers - 1 Consul client in dc2 and 1 vault over HTTPS.
+#### It will spin up 8 Vagrant machines with 3 Consul servers - 1 Consul client in dc1 and 3 Consul servers - 1 Consul client in dc2 and 1 vault server over HTTPS.
 
 #### The usage is pretty simple
 
+- At least 8GB ram
 - Vagrant should be [installed](https://www.vagrantup.com/)
 - Git should be [installed](https://git-scm.com/)
 - Since [Consul](https://www.consul.io/) require at least 3 servers in order to survive 1 server failure. Quorum requires at least (n/2)+1 members. If we need more servers, clients or a specific Consul version - it is simple as just change the numbers in the Vagrantfile
