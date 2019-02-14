@@ -33,11 +33,11 @@ vagrant up
 ##### DC1
 - Servers: https://192.168.56.51:8501 etc.
 - Clients: https://192.168.56.61:8501 etc.
-- NGINX: https://192.168.56.61 etc.
+- NGINX: http://192.168.56.61 etc.
 ##### DC2
 - Servers: https://192.168.57.51:8501 etc.
 - Clients: https://192.168.57.61:8501 etc.
-- NGINX: https://192.168.57.61 etc.
+- NGINX: http://192.168.57.61 etc.
 #### Test with infinite_loop.sh
 ```
 vagrant ssh consul-dc2-client01
