@@ -16,7 +16,7 @@ CONSUL_VERSION = '1.4.2'
 CONSUL_TEMPLATE_VERSION = '0.19.5'
 DOMAIN = 'consul'
 ```
-#### I have changed the [NGINX](https://www.nginx.com/resources/wiki/) Welcome page with [consul-template](https://github.com/hashicorp/consul-template)
+#### I have changed the [NGINX](https://www.nginx.com/resources/wiki/) Welcome page from [Consul KV Store](https://www.consul.io/api/kv.html)
 
 ### Now we are ready to start, just follow the steps:
 
