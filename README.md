@@ -22,8 +22,8 @@ DOMAIN = 'consul'
 
 - Clone the repo
 ```
-git clone git@github.com:chavo1/consul-multi-dc.git
-cd consul-multi-dc
+git clone git@github.com:chavo1/vault-consul-multi-dc.git
+cd vault-consul-multi-dc
 ```
 - Start the lab
 ```
