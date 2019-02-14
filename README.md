@@ -1,5 +1,5 @@
-## This repo contains a sample of Consul cluster in multi-datacenter deployment. 
-#### It will spin up 8 Vagrant machines with 3 Consul servers - 1 Consul client in dc1 and 3 Consul servers - 1 Consul client in dc2.
+## This repo contains a sample of Consul cluster in multi-datacenter deployment over HTTPS. 
+#### It will spin up 8 Vagrant machines with 3 Consul servers - 1 Consul client in dc1 and 3 Consul servers - 1 Consul client in dc2 and 1 vault over HTTPS.
 
 #### The usage is pretty simple
 
@@ -9,8 +9,11 @@
 ```
 SERVER_COUNT = 3
 CLIENT_COUNT = 1
-CONSUL_VERSION = '1.4.0'
+VAULT_COUNT = 1
+VAULT_VERSION = '1.0.2'
+CONSUL_VERSION = '1.4.2'
 CONSUL_TEMPLATE_VERSION = '0.19.5'
+DOMAIN = 'consul'
 ```
 #### I have changed the [NGINX](https://www.nginx.com/resources/wiki/) Welcome page with [consul-template](https://github.com/hashicorp/consul-template)
 
