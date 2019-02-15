@@ -4,9 +4,9 @@ which nginx &>/dev/null || {
     sudo apt get update -y
     sudo apt install nginx -y
     }
-
 service nginx stop
 
+TLS_ENABLE=${TLS_ENABLE}
 IPs=$(hostname -I | cut -f2 -d' ')
 HOST=$(hostname)
 
@@ -14,34 +14,33 @@ sudo mkdir -p /vagrant/pkg
 
 # If we need envconsul
 if which envconsul >/dev/null; then
-
 echo $nginx > /var/www/html/index.nginx-debian.html
-
 # Another examples
 # envconsul -pristine -prefix nginx env | sed 's/consul-client01=//g' > /var/www/html/index.nginx-debian.html
 # export `envconsul -pristine -prefix nginx env`; env
-
 # If we consul-template
 elif  which consul-template >/dev/null; then
-
 set -x
-#export HOST=$HOST
-#consul-template -config=/vagrant/templates/config.hcl > /vagrant/consul_logs/template_$HOST.log & 
-consul-template -consul-ssl -consul-ssl-ca-cert=/etc/consul.d/ssl/consul-agent-ca.pem -consul-addr=127.0.0.1:8501 -config=/vagrant/templates/config.hcl > /vagrant/consul_logs/template_$HOST.log &
-
-
-else
-  
+# export HOST=$HOST
+# consul-template -config=/vagrant/templates/config.hcl > /vagrant/consul_logs/template_$HOST.log & 
+    if [ "$TLS_ENABLE" = true ] ; then
+        consul-template -consul-ssl -consul-ssl-ca-cert=/etc/consul.d/ssl/consul-agent-ca.pem -consul-addr=127.0.0.1:8501 -config=/vagrant/templates/config.hcl > /vagrant/consul_logs/template_$HOST.log &
+    else
+        export HOST=$HOST
+        consul-template -config=/vagrant/templates/config.hcl > /vagrant/consul_logs/template_$HOST.log & 
+    fi
+else 
   # Updating nginx start page
-
-sudo curl -s -k https://127.0.0.1:8501/v1/kv/$HOST/nginx?raw > /var/www/html/index.nginx-debian.html
-
+    if [ "$TLS_ENABLE" = true ] ; then
+        sudo curl -s -k https://127.0.0.1:8501/v1/kv/$HOST/nginx?raw > /var/www/html/index.nginx-debian.html
+    else
+        rm /var/www/html/index.nginx-debian.html
+        sudo curl -s 127.0.0.1:8500/v1/kv/$HOST/nginx?raw > /var/www/html/index.nginx-debian.html
+    fi
 fi
-
 service nginx start
 
 sudo mkdir -p /etc/consul.d
-
 # create script to check nging welcome page
 cat << EOF > /tmp/welcome.sh
 #!/usr/bin/env bash
@@ -87,11 +86,15 @@ cat << EOF > /etc/consul.d/web.json
 }
 EOF
 
-
-consul reload -ca-file=/etc/consul.d/ssl/consul-agent-ca.pem -client-cert=/etc/consul.d/ssl/consul-agent.pem \
--client-key=/etc/consul.d/ssl/consul-agent.key -http-addr="https://127.0.0.1:8501"
-
-consul members -ca-file=/etc/consul.d/ssl/consul-agent-ca.pem -client-cert=/etc/consul.d/ssl/consul-agent.pem \
--client-key=/etc/consul.d/ssl/consul-agent.key -http-addr="https://127.0.0.1:8501"
+if [ "$TLS_ENABLE" = true ] ; then
+consul reload -ca-file=/etc/consul.d/ssl/consul-agent-ca.pem -http-addr="https://127.0.0.1:8501"
+else
+consul reload
+fi
+    if [ "$TLS_ENABLE" = true ] ; then
+    consul members -ca-file=/etc/consul.d/ssl/consul-agent-ca.pem -http-addr="https://127.0.0.1:8501"
+    else
+    consul members
+    fi
 
 set +x
