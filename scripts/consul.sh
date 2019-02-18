@@ -66,7 +66,6 @@ which consul || {
         pushd /vagrant/pkg
         wget https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip
         popd
- 
     fi
     
     pushd /usr/local/bin/
@@ -90,7 +89,7 @@ elif [[ $IPs =~ 192.168.57 ]]; then  # if 192.168.57 it is dc2
     DC_RANGE="192.168.57"
     DC=dc2
 else 
-  # In this case we not need else but after else must some command
+  # In this case we not need else but after else must exist some command
   echo "Hello... datacenter is wrong"
 fi   
 NODE_TYPE=client
@@ -160,18 +159,17 @@ sudo cat <<EOF > /etc/consul.d/server.json
 }
 EOF
 fi
-
 # starting consul agents
-if [[ $HOST =~ server ]]; then
-    # starting consul servers
-    consul agent -server -ui -advertise $IPs -config-dir=/etc/consul.d > /vagrant/consul_logs/$HOST.log & 
-else # starting consul clients
-    consul agent -ui -advertise $IPs -config-dir=/etc/consul.d > /vagrant/consul_logs/$HOST.log & 
-fi
+    if [[ $HOST =~ server ]]; then
+        # starting consul servers
+        consul agent -server -ui -advertise $IPs -config-dir=/etc/consul.d > /vagrant/consul_logs/$HOST.log & 
+    else # starting consul clients
+        consul agent -ui -advertise $IPs -config-dir=/etc/consul.d > /vagrant/consul_logs/$HOST.log & 
+    fi
 set +x
 sleep 5
-if [ "$TLS_ENABLE" = true ] ; then
-consul members -ca-file=/etc/consul.d/ssl/consul-agent-ca.pem -http-addr="https://127.0.0.1:8501"
-else
-consul members
-fi
+        if [ "$TLS_ENABLE" = true ] ; then
+        consul members -ca-file=/etc/consul.d/ssl/consul-agent-ca.pem -http-addr="https://127.0.0.1:8501"
+        else
+        consul members
+        fi
