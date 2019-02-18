@@ -119,7 +119,7 @@ if [ "$TLS_ENABLE" = true ] ; then
     sshpass -p 'vagrant' scp -o StrictHostKeyChecking=no vagrant@192.168.56.71:"/etc/vault.d/vault.crt" /etc/consul.d/ssl/
     unseal_vault $VaultunSeal
     acquiring_certs_from_vault ${VAULT_TOKEN} ${NODE_TYPE} ${DC} ${DOMAIN}
-    # Sealing Vault /// We duing this for security reason
+    # Sealing Vault /// We doing this for security reason
     curl --cacert /etc/consul.d/ssl/vault.crt --header "X-Vault-Token: ${VAULT_TOKEN}" --request PUT $VaultSeal
     enabling_gossip_encryption $HOST
 
