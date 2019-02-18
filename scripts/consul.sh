@@ -7,13 +7,6 @@ DOMAIN=${DOMAIN}
 TLS_ENABLE=${TLS_ENABLE}
 IPs=$(hostname -I | cut -f2 -d' ')
 HOST=$(hostname)
-VAULT_TOKEN=`cat /vagrant/token/keys.txt | grep "Initial Root Token:" | cut -c21-` # Vault token, it is needed to access vault
-httpUrl="https://192.168.56.71:8200/v1/pki_int/issue/example-dot-com" # Vault address, from where the certificates will be acquired
-VaultunSeal="https://192.168.56.71:8200/v1/sys/unseal" # Curl url to unseal Vault
-VaultSeal="https://192.168.56.71:8200/v1/sys/seal" # Curl url to seal Vault
-key0=`cat /vagrant/token/keys.txt | grep "Unseal Key 1:" | cut -c15-` #
-key1=`cat /vagrant/token/keys.txt | grep "Unseal Key 2:" | cut -c15-` # Needed keys to unseal Vault
-key2=`cat /vagrant/token/keys.txt | grep "Unseal Key 3:" | cut -c15-` #
 
 #############
 # Functions #
@@ -112,6 +105,16 @@ NODE_TYPE=client
 # Enabling gossip encryption #    since gossip between nodes is done over UDP.
 ##############################  https://learn.hashicorp.com/consul/advanced/day-1-operations/agent-encryption#enable-gossip-encryption-existing-cluster
 if [ "$TLS_ENABLE" = true ] ; then
+    
+    # Setting variables 
+    VAULT_TOKEN=`cat /vagrant/token/keys.txt | grep "Initial Root Token:" | cut -c21-` # Vault token, it is needed to access vault
+    httpUrl="https://192.168.56.71:8200/v1/pki_int/issue/example-dot-com" # Vault address, from where the certificates will be acquired
+    VaultunSeal="https://192.168.56.71:8200/v1/sys/unseal" # Curl url to unseal Vault
+    VaultSeal="https://192.168.56.71:8200/v1/sys/seal" # Curl url to seal Vault
+    key0=`cat /vagrant/token/keys.txt | grep "Unseal Key 1:" | cut -c15-` #
+    key1=`cat /vagrant/token/keys.txt | grep "Unseal Key 2:" | cut -c15-` # Needed keys to unseal Vault
+    key2=`cat /vagrant/token/keys.txt | grep "Unseal Key 3:" | cut -c15-` #
+    
     # Copy the certificate from Vault in order to autorize consul agents to comunicate with Vault
     sshpass -p 'vagrant' scp -o StrictHostKeyChecking=no vagrant@192.168.56.71:"/etc/vault.d/vault.crt" /etc/consul.d/ssl/
     unseal_vault $VaultunSeal
