@@ -8,10 +8,10 @@ service nginx stop
 
 TLS_ENABLE=${TLS_ENABLE}
 IPs=$(hostname -I | cut -f2 -d' ')
-HOST=$(hostname)
+export HOST=$(hostname)
 
 sudo mkdir -p /vagrant/pkg
-
+set -x
 # If we need envconsul
 if which envconsul >/dev/null; then
 echo $nginx > /var/www/html/index.nginx-debian.html
@@ -20,13 +20,12 @@ echo $nginx > /var/www/html/index.nginx-debian.html
 # export `envconsul -pristine -prefix nginx env`; env
 # If we consul-template
 elif  which consul-template >/dev/null; then
-set -x
 # export HOST=$HOST
 # consul-template -config=/vagrant/templates/config.hcl > /vagrant/consul_logs/template_$HOST.log & 
     if [ "$TLS_ENABLE" = true ] ; then
-        consul-template -consul-ssl -consul-ssl-ca-cert=/etc/consul.d/ssl/consul-agent-ca.pem -consul-addr=127.0.0.1:8501 -config=/vagrant/templates/config.hcl > /vagrant/consul_logs/template_$HOST.log &
+        consul-template -consul-ssl -consul-ssl-ca-cert=/etc/consul.d/ssl/consul-agent-ca.pem -consul-addr=127.0.0.1:8501 \
+         -config=/vagrant/templates/config.hcl > /vagrant/consul_logs/template_$HOST.log &
     else
-        export HOST=$HOST
         consul-template -config=/vagrant/templates/config.hcl > /vagrant/consul_logs/template_$HOST.log & 
     fi
 else 
