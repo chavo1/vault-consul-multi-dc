@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 which nginx &>/dev/null || {
-    sudo apt get update -y
-    sudo apt install nginx -y
+    sudo apt-get update -y
+    sudo apt-get install nginx -y
     }
 service nginx stop
 
@@ -20,13 +20,11 @@ echo $nginx > /var/www/html/index.nginx-debian.html
 # export `envconsul -pristine -prefix nginx env`; env
 # If we consul-template
 elif  which consul-template >/dev/null; then
-# export HOST=$HOST
-# consul-template -config=/vagrant/templates/config.hcl > /vagrant/consul_logs/template_$HOST.log & 
     if [ "$TLS_ENABLE" = true ] ; then
         consul-template -consul-ssl -consul-ssl-ca-cert=/etc/consul.d/ssl/consul-agent-ca.pem -consul-addr=127.0.0.1:8501 \
-         -config=/vagrant/templates/config.hcl > /vagrant/consul_logs/template_$HOST.log &
+         -log-level=trace -config=/vagrant/templates/config.hcl &> /vagrant/consul_logs/template_$HOST.log &
     else
-        consul-template -config=/vagrant/templates/config.hcl > /vagrant/consul_logs/template_$HOST.log & 
+        consul-template -log-level=trace -config=/vagrant/templates/config.hcl &> /vagrant/consul_logs/template_$HOST.log & 
     fi
 else 
   # Updating nginx start page
