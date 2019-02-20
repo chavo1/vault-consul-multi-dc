@@ -14,7 +14,9 @@ VAULT_COUNT = 1
 VAULT_VERSION = '1.0.2'
 CONSUL_VERSION = '1.4.2'
 CONSUL_TEMPLATE_VERSION = '0.19.5'
+ENVCONSUL_VERSION = '0.7.3'
 DOMAIN = 'consul'
+TLS_ENABLE = true
 ```
 #### There is 3 ways to populate the NGINX Welcome page:
 
