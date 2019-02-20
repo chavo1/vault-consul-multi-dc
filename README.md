@@ -16,8 +16,24 @@ CONSUL_VERSION = '1.4.2'
 CONSUL_TEMPLATE_VERSION = '0.19.5'
 DOMAIN = 'consul'
 ```
-#### I have changed the [NGINX](https://www.nginx.com/resources/wiki/) Welcome page with [consul-template](https://github.com/hashicorp/consul-template)
+#### There is 3 ways to populate the NGINX Welcome page:
 
+- With envconsul - Just comment 'nginx.sh' and 'consul-template.sh' under the Client section.
+```
+#client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/consul-template.sh", env: {"CONSUL_TEMPLATE_VERSION" => CONSUL_TEMPLATE_VERSION}
+#client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/nginx.sh"
+```
+- With consul-template - Just comment 'envconsul.sh' and 'call_nginx.sh' under the Client section.
+```
+#client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/envconsul.sh", env: {"ENVCONSUL_VERSION" => ENVCONSUL_VERSION}
+#client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/call_nginx.sh"
+```
+- With API - Just comment 'consul-template.sh', 'envconsul.sh' and 'call_nginx.sh' under the Client section.
+```
+#client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/consul-template.sh", env: {"CONSUL_TEMPLATE_VERSION" => CONSUL_TEMPLATE_VERSION}
+#client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/envconsul.sh", env: {"ENVCONSUL_VERSION" => ENVCONSUL_VERSION}
+#client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/call_nginx.sh"
+```
 ### Now we are ready to start, just follow the steps:
 
 - Clone the repo

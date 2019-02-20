@@ -100,11 +100,18 @@ NODE_TYPE=client
   LAN=", \"retry_join\": [ \"$DC_RANGE.51\", \"$DC_RANGE.52\", \"$DC_RANGE.53\" ]"
   WAN=", \"retry_join_wan\": [ \"$DC_RANGE_OP.51\", \"$DC_RANGE_OP.52\", \"$DC_RANGE_OP.53\" ]"
 
-############################## Gossip encryption is secured with a symmetric key,
-# Enabling gossip encryption #    since gossip between nodes is done over UDP.
-##############################  https://learn.hashicorp.com/consul/advanced/day-1-operations/agent-encryption#enable-gossip-encryption-existing-cluster
+######################## 
+# Creating consul user # 
+########################
+sudo groupadd --system consul
+sudo useradd -s /sbin/nologin --system -g consul consul
+sudo mkdir -p /var/lib/consul
+sudo chown -R consul:consul /var/lib/consul
+sudo chmod -R 775 /var/lib/consul
+sudo chown -R consul:consul /etc/consul.d/ssl 
+
+# If TLS is enabled
 if [ "$TLS_ENABLE" = true ] ; then
-    
     # Setting variables 
     VAULT_TOKEN=`cat /vagrant/token/keys.txt | grep "Initial Root Token:" | cut -c21-` # Vault token, it is needed to access vault
     httpUrl="https://192.168.56.71:8200/v1/pki_int/issue/example-dot-com" # Vault address, from where the certificates will be acquired
@@ -112,22 +119,24 @@ if [ "$TLS_ENABLE" = true ] ; then
     VaultSeal="https://192.168.56.71:8200/v1/sys/seal" # Curl url to seal Vault
     key0=`cat /vagrant/token/keys.txt | grep "Unseal Key 1:" | cut -c15-` #
     key1=`cat /vagrant/token/keys.txt | grep "Unseal Key 2:" | cut -c15-` # Needed keys to unseal Vault
-    key2=`cat /vagrant/token/keys.txt | grep "Unseal Key 3:" | cut -c15-` #
-    
+    key2=`cat /vagrant/token/keys.txt | grep "Unseal Key 3:" | cut -c15-` #  
     # Copy the certificate from Vault in order to autorize consul agents to comunicate with Vault
     sshpass -p 'vagrant' scp -o StrictHostKeyChecking=no vagrant@192.168.56.71:"/etc/vault.d/vault.crt" /etc/consul.d/ssl/
     unseal_vault $VaultunSeal
     acquiring_certs_from_vault ${VAULT_TOKEN} ${NODE_TYPE} ${DC} ${DOMAIN}
-    # Sealing Vault /// We doing this for security reason
+    # Sealing Vault /// We duing this for security reason
     curl --cacert /etc/consul.d/ssl/vault.crt --header "X-Vault-Token: ${VAULT_TOKEN}" --request PUT $VaultSeal
     enabling_gossip_encryption $HOST
 
+########################
+# Adding consul config #
+########################
 sudo cat <<EOF > /etc/consul.d/tls.json
 {
   "verify_outgoing": true,
   "verify_server_hostname": true,
   "verify_incoming_https": false,
-  "verify_incoming_rpc": true, 
+  "verify_incoming_rpc": true,
   "ca_file": "/etc/consul.d/ssl/consul-agent-ca.pem",  
   "cert_file": "/etc/consul.d/ssl/consul-agent.pem",
   "key_file": "/etc/consul.d/ssl/consul-agent.key",
@@ -139,15 +148,16 @@ sudo cat <<EOF > /etc/consul.d/tls.json
 EOF
 
 fi
-# Creating consul configuration files - they are almost the same so - just a few variables
+
 sudo cat <<EOF > /etc/consul.d/config.json
 { 
   "datacenter": "${DC}",
   "ui": true,
   "client_addr": "0.0.0.0",
   "bind_addr": "0.0.0.0",
+  "advertise_addr": "${IPs}",
   "enable_script_checks": true,
-  "data_dir": "/usr/local/consul"${LAN}
+  "data_dir": "/var/lib/consul"${LAN}
 }
 EOF
 
@@ -159,13 +169,63 @@ sudo cat <<EOF > /etc/consul.d/server.json
 }
 EOF
 fi
-# starting consul agents
-    if [[ $HOST =~ server ]]; then
-        # starting consul servers
-        consul agent -server -ui -advertise $IPs -config-dir=/etc/consul.d > /vagrant/consul_logs/$HOST.log & 
-    else # starting consul clients
-        consul agent -ui -advertise $IPs -config-dir=/etc/consul.d > /vagrant/consul_logs/$HOST.log & 
+
+####################################
+# Consul Server systemd Unit file  #
+####################################
+sudo cat <<EOF > /etc/systemd/system/consul.service
+### BEGIN INIT INFO
+# Provides:          consul
+# Required-Start:    $local_fs $remote_fs
+# Required-Stop:     $local_fs $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Consul agent
+# Description:       Consul service discovery framework
+### END INIT INFO
+
+[Unit]
+Description=Consul server agent
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+User=consul
+Group=consul
+PIDFile=/var/run/consul/consul.pid
+PermissionsStartOnly=true
+ExecStartPre=-/bin/mkdir -p /var/run/consul
+ExecStartPre=/bin/chown -R consul:consul /var/run/consul
+ExecStart=/usr/local/bin/consul agent \
+    -config-dir=/etc/consul.d/ \
+    -pid-file=/var/run/consul/consul.pid
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+KillSignal=SIGTERM
+Restart=on-failure
+RestartSec=42s
+
+[Install]
+WantedBy=multi-user.target
+
+EOF
+
+###################
+# Starting Consul #
+###################
+sudo systemctl daemon-reload
+sudo systemctl start consul
+
+###########################
+# Redirecting conslul log #
+###########################
+    if [ -d /vagrant ]; then
+        mkdir -p /vagrant/consul_logs
+        journalctl -f -u consul.service > /vagrant/consul_logs/${HOST}.log &
+    else
+        journalctl -f -u consul.service > /tmp/consul.log
     fi
+echo consul started
 set +x
 sleep 5
         if [ "$TLS_ENABLE" = true ] ; then
