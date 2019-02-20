@@ -1,4 +1,4 @@
-## This repo contains a sample of Consul cluster in multi-datacenter deployment over HTTPS and HTTP. 
+## This repo contains a sample of Consul cluster in multi-datacenter deployment over HTTPS and HTTP as a systemd daemon service. 
 #### It will spin up 8 Vagrant machines with 3 Consul servers - 1 Consul client in dc1 and 3 Consul servers - 1 Consul client in dc2 and 1 vault server over HTTPS. If HTTPS is not needed just change it to false - will be created two DCs without [Vault](https://www.vaultproject.io/).
 
 #### The usage is pretty simple
