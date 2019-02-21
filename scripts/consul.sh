@@ -81,16 +81,19 @@ sudo mkdir -p /etc/consul.d/ssl /vagrant/consul_logs
 # # Starting consul servers #
 # ###########################
 if [[ $IPs =~ 192.168.56 ]]; then # if 192.168.56 it is dc1
-    DC_RANGE_OP="192.168.57"
     DC_RANGE="192.168.56"
     DC=dc1
+    WAN=""
 elif [[ $IPs =~ 192.168.57 ]]; then  # if 192.168.57 it is dc2
     DC_RANGE_OP="192.168.56"
     DC_RANGE="192.168.57"
     DC=dc2
+    WAN=", \"retry_join_wan\": [ \"$DC_RANGE_OP.51\", \"$DC_RANGE_OP.52\", \"$DC_RANGE_OP.53\" ]"
 else 
-  # In this case we not need else but after else must exist some command
-  echo "Hello... datacenter is wrong"
+    DC_RANGE_OP="192.168.57"
+    DC_RANGE="192.168.58"
+    DC=dc3
+    WAN=", \"retry_join_wan\": [ \"$DC_RANGE_OP.51\", \"$DC_RANGE_OP.52\", \"$DC_RANGE_OP.53\" ]"
 fi   
 NODE_TYPE=client
   if [[ $HOST =~ server ]]; then
@@ -98,7 +101,7 @@ NODE_TYPE=client
     NODE_TYPE=server
   fi
   LAN=", \"retry_join\": [ \"$DC_RANGE.51\", \"$DC_RANGE.52\", \"$DC_RANGE.53\" ]"
-  WAN=", \"retry_join_wan\": [ \"$DC_RANGE_OP.51\", \"$DC_RANGE_OP.52\", \"$DC_RANGE_OP.53\" ]"
+  
 
 ######################## 
 # Creating consul user # 
