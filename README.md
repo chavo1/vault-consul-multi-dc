@@ -1,5 +1,5 @@
 ## This repo contains a sample of Consul cluster in multi-datacenter deployment over HTTPS and HTTP as a systemd daemon service. 
-#### If HTTPS is not needed just change it to false - will be created two DCs without [Vault](https://www.vaultproject.io/).
+#### If HTTPS is not needed just change it to false - will be created need DCs without [Vault](https://www.vaultproject.io/).
 
 #### The usage is pretty simple
 
