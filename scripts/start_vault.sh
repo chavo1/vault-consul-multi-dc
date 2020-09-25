@@ -6,12 +6,12 @@ HOST=$(hostname)
 set -x
 
 # kill vault
-sudo killall vault &>/dev/null
+killall vault &>/dev/null
 
 sleep 5
 
 # Create vault configuration
-sudo mkdir -p /etc/vault.d
+mkdir -p /etc/vault.d
 
 cat << EOF >/etc/vault.d/config.hcl
 storage "file" {
@@ -85,10 +85,10 @@ popd
 
 # setup .bash_profile
 grep VAULT_ADDR ~/.bash_profile || {
-  echo export VAULT_ADDR=https://127.0.0.1:8200 | sudo tee -a ~/.bash_profile
+  echo export VAULT_ADDR=https://127.0.0.1:8200 | sudo tee -a ~/.bashrc
 }
 
-source ~/.bash_profile
+source ~/.bashrc
 ##################
 # starting vault #
 ##################

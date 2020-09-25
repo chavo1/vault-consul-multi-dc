@@ -11,7 +11,7 @@ which ${PKG} &>/dev/null || {
 
 mkdir -p /vagrant/pkg/
 
-which consul &>/dev/null || {
+which vault &>/dev/null || {
     # check - vault file exist.
     CHECKFILE="/vagrant/pkg/vault_${VAULT_VERSION}_linux_amd64.zip"
     if [ ! -f "$CHECKFILE" ]; then
