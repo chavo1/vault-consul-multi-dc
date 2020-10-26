@@ -1,13 +1,13 @@
-
-SERVER_COUNT = 1
+SERVER_COUNT = 3
 CLIENT_COUNT = 1
 VAULT_COUNT = 1
-VAULT_VERSION = '1.5.3'
-CONSUL_VERSION = '1.8.4'
+VAULT_VERSION = '1.5.5'
+CONSUL_VERSION = '1.9.0-beta1'
 CONSUL_TEMPLATE_VERSION = '0.25.1'
 ENVCONSUL_VERSION = '0.10.0'
 DOMAIN = 'consul'
 TLS_ENABLE = true
+
 datacenters = {
   "dc1" => { :ip_range => "192.168.56" },
   "dc2" => { :ip_range => "192.168.57" },
@@ -15,7 +15,7 @@ datacenters = {
 }
 
 Vagrant.configure(2) do |config|
-    config.vm.box = "chavo1/xenial64base"
+    config.vm.box = "chavo1/bionic64base"
     config.vm.provider "virtualbox" do |v|
       v.memory = 512
       v.cpus = 2
@@ -70,6 +70,7 @@ Vagrant.configure(2) do |config|
         #client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/call_nginx.sh", env: {"TLS_ENABLE" => TLS_ENABLE}
         client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/nginx.sh", env: {"TLS_ENABLE" => TLS_ENABLE}
         client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/dns.sh"
+        client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/install_go.sh"
       
       end
     end

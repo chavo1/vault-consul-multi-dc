@@ -83,8 +83,8 @@ openssl req -x509 -batch -nodes -newkey rsa:2048 -keyout vault.key -out vault.cr
 cat vault.crt >> /usr/lib/ssl/certs/ca-certificates.crt
 popd
 
-# setup .bash_profile
-grep VAULT_ADDR ~/.bash_profile || {
+# setup ~/.bashrc
+grep VAULT_ADDR ~/.bashrc || {
   echo export VAULT_ADDR=https://127.0.0.1:8200 | sudo tee -a ~/.bashrc
 }
 
@@ -132,6 +132,7 @@ StartLimitBurst=3
 WantedBy=multi-user.target
 EOF
 
+chown -R vault:vault /etc/vault.d
 sudo systemctl daemon-reload
 sudo systemctl start vault
 
