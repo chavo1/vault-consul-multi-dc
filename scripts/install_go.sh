@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Installs Golang
 
+# Install Golang
 [ "${GOLANG_FILE}" ] || GOLANG_FILE="go1.15.2.linux-amd64.tar.gz"
 
 sudo apt-get update
