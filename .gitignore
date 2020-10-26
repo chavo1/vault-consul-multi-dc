@@ -7,3 +7,5 @@ vault_logs
 CA_cert.crt
 intermediate.cert.pem
 pki_intermediate.csr
+services/
+.DS_Store

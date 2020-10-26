@@ -16,7 +16,7 @@ unseal_vault () {
             echo $x
             for u in {0..2}; do
                 ukey=key${x}
-                `curl --cacert /etc/consul.d/ssl/vault.crt --header --request PUT --data '{"key": "'${!ukey}'"}' $1`
+                `curl --insecure --cacert /etc/consul.d/ssl/vault.crt --header --request PUT --data '{"key": "'${!ukey}'"}' $1`
             done
         done
 }
@@ -24,7 +24,7 @@ unseal_vault () {
 acquiring_certs_from_vault () {
 
       pushd /etc/consul.d/ssl/
-          GENCERT=`curl --cacert /etc/consul.d/ssl/vault.crt --header "X-Vault-Token: $1" --request POST --data '{"common_name": "'$2.$3.$4'", "ttl": "24h", "alt_names": "localhost", "ip_sans": "127.0.0.1"}' $httpUrl`
+          GENCERT=`curl --insecure --cacert /etc/consul.d/ssl/vault.crt --header "X-Vault-Token: $1" --request POST --data '{"common_name": "'$2.$3.$4'", "ttl": "24h", "alt_names": "localhost", "ip_sans": "127.0.0.1"}' $httpUrl`
         if [ $? -ne 0 ]; then
             echo "Vault is not available. Exit ..."
             exit 1 # if vault is not available script will be terminated
@@ -127,7 +127,7 @@ if [ "$TLS_ENABLE" = true ] ; then
     sshpass -p 'vagrant' scp -o StrictHostKeyChecking=no vagrant@192.168.56.71:"/etc/vault.d/vault.crt" /etc/consul.d/ssl/
     unseal_vault $VaultunSeal
     acquiring_certs_from_vault ${VAULT_TOKEN} ${NODE_TYPE} ${DC} ${DOMAIN}
-    # Sealing Vault /// We duing this for security reason
+    # Sealing Vault /// We doing this for security reason
     curl --cacert /etc/consul.d/ssl/vault.crt --header "X-Vault-Token: ${VAULT_TOKEN}" --request PUT $VaultSeal
     enabling_gossip_encryption $HOST
 
@@ -160,6 +160,16 @@ sudo cat <<EOF > /etc/consul.d/config.json
   "bind_addr": "0.0.0.0",
   "advertise_addr": "${IPs}",
   "enable_script_checks": true,
+  "connect": [
+    {
+      "enabled": true
+    }
+  ],
+  "ports": [
+    {
+      "grpc": 8502
+    }
+  ],
   "data_dir": "/var/lib/consul"${LAN}
 }
 EOF
@@ -216,6 +226,8 @@ EOF
 ###################
 # Starting Consul #
 ###################
+
+chown -R consul:consul /etc/consul.d
 sudo systemctl daemon-reload
 sudo systemctl start consul
 
