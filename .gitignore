@@ -9,3 +9,6 @@ intermediate.cert.pem
 pki_intermediate.csr
 services/
 .DS_Store
+counting-proxy.log
+dashboard-proxy.log
+services_logs/

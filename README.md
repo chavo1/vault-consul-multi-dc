@@ -87,3 +87,13 @@ systemctl start nginx
 tail -f /vagrant/conul_log/loop.log
 ```
 #### In loop.log you will be able to see redirection in real time
+
+#### Secure Service Communication with Consul Service Mesh according to the following article:
+
+https://learn.hashicorp.com/tutorials/consul/service-mesh-with-envoy-proxy
+
+##### Consul connect demo service flow
+<img src="screenshots/consul_connect_demo_service_flow.png" />
+
+##### Consul UI
+<img src="screenshots/ConsulUI.png" />
