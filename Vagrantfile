@@ -41,9 +41,8 @@ Vagrant.configure(2) do |config|
       ################
       #    CONSUL    #
       ################
-  
       datacenters.each.with_index(1) do |(dc, info), index|
-    
+          
     1.upto(SERVER_COUNT) do |n|
       config.vm.define "consul-#{dc}-server0#{n}" do |server|
         server.vm.hostname = "consul-#{dc}-server0#{n}"
@@ -52,9 +51,9 @@ Vagrant.configure(2) do |config|
                                                                                           "DOMAIN" => DOMAIN, 
                                                                                           "CONSUL_VERSION" => CONSUL_VERSION, 
                                                                                           "SERVER_COUNT" => SERVER_COUNT}
-
-      end
+        server.vm.provision "shell", path: "scripts/sidecar.sh", args: "#{dc} #{TLS_ENABLE} #{SERVER_COUNT}"
     end
+  end
 
     1.upto(CLIENT_COUNT) do |n|
       config.vm.define "consul-#{dc}-client0#{n}" do |client|
@@ -70,8 +69,6 @@ Vagrant.configure(2) do |config|
         #client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/call_nginx.sh", env: {"TLS_ENABLE" => TLS_ENABLE}
         client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/nginx.sh", env: {"TLS_ENABLE" => TLS_ENABLE}
         client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/dns.sh"
-        client.vm.provision "shell",inline: "cd /vagrant ; bash scripts/install_go.sh"
-      
       end
     end
   end
