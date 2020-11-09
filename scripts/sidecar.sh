@@ -22,14 +22,14 @@ CHECKFILE1="/vagrant/services/counting-service_linux_amd64"
 CHECKFILE2="/vagrant/services/dashboard-service_linux_amd64"
 if [ ! -f "$CHECKFILE1" ]; then
     pushd /vagrant/services
-    wget https://github.com/hashicorp/demo-consul-101/releases/download/0.0.3/counting-service_linux_amd64.zip
+    wget https://github.com/hashicorp/demo-consul-101/releases/download/0.0.3.1/counting-service_linux_amd64.zip
     unzip ./counting-service_linux_amd64.zip
     popd
 fi
 # check if dashboard service file exist.
 if [ ! -f "$CHECKFILE2" ]; then
     pushd /vagrant/services
-    wget https://github.com/hashicorp/demo-consul-101/releases/download/0.0.3/dashboard-service_linux_amd64.zip
+    wget https://github.com/hashicorp/demo-consul-101/releases/download/0.0.3.1/dashboard-service_linux_amd64.zip
     unzip ./dashboard-service_linux_amd64.zip
     popd
 fi
