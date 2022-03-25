@@ -6,6 +6,7 @@
 - At least 8GB ram
 - Vagrant should be [installed](https://www.vagrantup.com/)
 - Git should be [installed](https://git-scm.com/)
+- In Windows Remove trailing `\r` character `sed -i 's/\r$//' filename`
 - Since [Consul](https://www.consul.io/) require at least 3 servers in order to survive 1 server failure. Quorum requires at least (n/2)+1 members. If we need more servers, clients or a specific Consul version - it is simple as just change the numbers in the Vagrantfile
 ```
 SERVER_COUNT = 3
